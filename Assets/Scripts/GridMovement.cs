@@ -2,33 +2,30 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridMovement : MonoBehaviour {
+public class GridMovement: MonoBehaviour {
 	
 	#region Grid Elements
 	public Transform gridContainer;
+	public Transform emiters;
 	private Transform[,] Grid = new Transform[6,10];
 	private List<Transform> OrderedGrid;
 	#endregion
 	
 	#region cell selection
 	private bool selectedCell = false;
-	private Cell selectedCellItem;
-	private Vector3 SelectedCellPosition;
+	private Vector3 selectedCellPosition;
 	private float selectionTime;
 	private float finalTime;
 	private Vector3 mouseDirection;
 	#endregion
 	
-	#region Detection Mouse
-	private Ray identifierRay;
-	private RaycastHit rayItem;
-	
-	private Transform cell;
+	#region Snap to Grid
+	bool snappingToGrid = false;
 	#endregion
 	
 	#region Grid Movement
 	private Vector2 index;
-	private Transform currentMovingCell;
+	private RaycastHit[] movingCells;
 	private float direction; //positive one dir - negative the other
 	private int axis;
 	#endregion
@@ -44,104 +41,93 @@ public class GridMovement : MonoBehaviour {
 	{
 		if(!selectedCell)
 		{
-			//Debug.Log("No Cell Selected");
+			Debug.Log("No Cell Selected");
 			if(Input.GetMouseButtonDown(0))
 			{
-				Debug.Log("Cells Selecting");
+				selectionTime = Time.time;
 				
-				//StartCoroutine(axisManager());
+				//check mouse click position
+				selectedCellPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+				selectedCellPosition.y = 2f; //set in the grid plane
 				
-				identifierRay = new Ray(
-					new Vector3(-5.5f, 2.0f, 2.5f),
-					Vector3.right);
-//				identifierRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-				Debug.DrawRay(identifierRay.origin,identifierRay.direction,Color.yellow,10f);
-				if(Physics.Raycast(identifierRay,out rayItem))
-				{
-					RaycastHit[] temp = Physics.RaycastAll(identifierRay,10f);
-					Debug.Log(temp.Length);
-//					cell = rayItem.transform;
-//					
-//					selectedCellItem = cell.GetComponent<Cell>();
-//					SelectedCellPosition = selectedCellItem.pos;
-//					
-//					index.x = SelectedCellPosition.x + 4.5f;
-//					index.y = SelectedCellPosition.y + 2.5f;
-//					
-//					selectionTime = Time.time;
-				}
+				//define Index for emiters as 0 based
+				index.x = Mathf.Floor(selectedCellPosition.x) + 5;
+				index.y = Mathf.Floor(selectedCellPosition.z) + 3;
+				
+				StartCoroutine(axisManager());
 			}
 		}
 		else
 		{
-//			if(axis != 0)
-//			{
-//				updatePosition();
-//				if(Input.GetMouseButtonUp(0))
-//				{
-//					
-//					selectedCell = false;
-//				}
-//			}
+			if(axis != 0)
+			{
+				if(!snappingToGrid)
+					UpdatePosition();
+				else;
+			}
+			if(Input.GetMouseButtonUp(0))
+			{
+				//selectedCell = false;
+				snappingToGrid = true;
+			}
 		}
 	}
 	
-	void updatePosition()
+	void UpdatePosition()
 	{
-		try
+		switch(axis)
 		{
-			Vector3 currentMousePosition;
-			Vector3 move2Vector;
+		case -1:
 			
-			currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			currentMousePosition.y = 2.0f;
-			
-			if(axis != 0)
-			{
-				if(axis > 0)
-				{
-					currentMousePosition.z = SelectedCellPosition.z;
-					for(int i = 0; i < 10; i++)
-					{
-						currentMovingCell = Grid[(int)index.y,i];
-						move2Vector = new Vector3(currentMousePosition.x + (i-index.x), 
-								currentMousePosition.y, 
-								currentMousePosition.z);
-						
-						currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
-							move2Vector,
-							Time.deltaTime * 5f);
-					}
-					
-				}
-				else if(axis < 0)
-				{
-					currentMousePosition.x = SelectedCellPosition.x;
-					for(int i = 0; i < 6; i++)
-					{
-						currentMovingCell = Grid[i,(int)index.x];
-						if(currentMovingCell == null)
-						{
-							
-							Debug.Log ("NULL BREAK 3: " + Grid.Length	);
-							Debug.Log ("Position 3: ind.y - " + (int)index.y + " - i - " + i);
-							Debug.DebugBreak();
-						}
-						currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
-							new Vector3(currentMousePosition.x, 
-								currentMousePosition.y, 
-								currentMousePosition.z + (i-index.y)),
-							Time.deltaTime * 5f);
-					}
-				}
-			}
+			break;
+		case 1:
+			break;
+		default:
+			break;
 		}
-		catch(System.Exception e)
+	}
+	
+	IEnumerator axisManager()
+	{
+		selectedCell = true;
+		movingCells = null;
+		axis = 0;
+		
+		float timeDiff;
+		Vector3 posDiff;
+		
+		Vector3 origin, destination;
+		
+		yield return new WaitForSeconds(0.1f);
+		
+		mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		finalTime = Time.time;
+		timeDiff = selectionTime - finalTime;
+		
+		posDiff = selectedCellPosition - mouseDirection;
+		
+		if(Mathf.Abs(posDiff.x) > Mathf.Abs(posDiff.z))
 		{
-			Debug.Break();
-			Debug.Log("ERROR: " + e.StackTrace);
-			//printGrid();
-		}
+			Debug.Log("X axis");
+			axis = 1;
+			direction = Mathf.Abs(posDiff.x)/timeDiff;
+			direction *= posDiff.x/Mathf.Abs(posDiff.x);
+			
+			origin = emiters.FindChild(axis.ToString()).FindChild(index.y.ToString()).transform.position;
+			destination = Vector3.right;
+			movingCells = Physics.RaycastAll(origin,destination,11f);
+		} 
+		else
+		{
+			Debug.Log("Y axis");
+			axis = -1;
+			direction = Mathf.Abs(posDiff.z)/timeDiff;
+			direction *= posDiff.z/Mathf.Abs(posDiff.z);
+			
+			origin = emiters.FindChild(axis.ToString()).FindChild(index.x.ToString()).transform.position;
+			destination = Vector3.back;
+			movingCells = Physics.RaycastAll(origin,destination,6f);
+		}	
 	}
 	
 	void printGrid()
@@ -174,35 +160,5 @@ public class GridMovement : MonoBehaviour {
 			count++;
 		}
 		Debug.Log(count);
-	}
-	IEnumerator axisManager()
-	{
-		selectedCell = true;
-		float timeDiff;
-		Vector3 posDiff;
-		
-		yield return new WaitForSeconds(0.1f);
-		
-		mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		finalTime = Time.time;
-		timeDiff = selectionTime - finalTime;
-		
-		posDiff = SelectedCellPosition - mouseDirection;
-		
-		if(Mathf.Abs(posDiff.x) > Mathf.Abs(posDiff.z))
-		{
-			Debug.Log("X axis");
-			axis = 1;
-			direction = Mathf.Abs(posDiff.x)/timeDiff;
-			direction *= posDiff.x/Mathf.Abs(posDiff.x);
-		}
-		else
-		{
-			Debug.Log("Y axis");
-			axis = -1;
-			direction = Mathf.Abs(posDiff.z)/timeDiff;
-			direction *= posDiff.z/Mathf.Abs(posDiff.z);
-		}
-		
 	}
 }
