@@ -12,6 +12,7 @@ public class GridMovement : MonoBehaviour {
 	
 	#region cell selection
 	private bool selectedCell = false;
+	private Cell selectedCellItem;
 	private Vector3 SelectedCellPosition;
 	private float selectionTime;
 	private float finalTime;
@@ -43,31 +44,45 @@ public class GridMovement : MonoBehaviour {
 	{
 		if(!selectedCell)
 		{
-			Debug.Log("No Cell Selected");
+			//Debug.Log("No Cell Selected");
 			if(Input.GetMouseButtonDown(0))
 			{
-				Debug.Log("Cell Selecting");
-				StartCoroutine(axisManager());
-				identifierRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+				Debug.Log("Cells Selecting");
+				
+				//StartCoroutine(axisManager());
+				
+				identifierRay = new Ray(
+					new Vector3(-5.5f, 2.0f, 2.5f),
+					Vector3.right);
+//				identifierRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+				Debug.DrawRay(identifierRay.origin,identifierRay.direction,Color.yellow,10f);
 				if(Physics.Raycast(identifierRay,out rayItem))
 				{
-					cell = rayItem.transform;
-					SelectedCellPosition = cell.position;
-					
-					index.x = SelectedCellPosition.x + 4.5f;
-					index.y = SelectedCellPosition.z + 2.5f;
-					
-					selectionTime = Time.time;
+					RaycastHit[] temp = Physics.RaycastAll(identifierRay,10f);
+					Debug.Log(temp.Length);
+//					cell = rayItem.transform;
+//					
+//					selectedCellItem = cell.GetComponent<Cell>();
+//					SelectedCellPosition = selectedCellItem.pos;
+//					
+//					index.x = SelectedCellPosition.x + 4.5f;
+//					index.y = SelectedCellPosition.y + 2.5f;
+//					
+//					selectionTime = Time.time;
 				}
 			}
 		}
 		else
 		{
-			updatePosition();
-			if(Input.GetMouseButtonUp(0))
-			{
-				selectedCell = false;
-			}
+//			if(axis != 0)
+//			{
+//				updatePosition();
+//				if(Input.GetMouseButtonUp(0))
+//				{
+//					
+//					selectedCell = false;
+//				}
+//			}
 		}
 	}
 	
@@ -76,6 +91,7 @@ public class GridMovement : MonoBehaviour {
 		try
 		{
 			Vector3 currentMousePosition;
+			Vector3 move2Vector;
 			
 			currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			currentMousePosition.y = 2.0f;
@@ -88,10 +104,12 @@ public class GridMovement : MonoBehaviour {
 					for(int i = 0; i < 10; i++)
 					{
 						currentMovingCell = Grid[(int)index.y,i];
-						currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
-							new Vector3(currentMousePosition.x + (i-index.x), 
+						move2Vector = new Vector3(currentMousePosition.x + (i-index.x), 
 								currentMousePosition.y, 
-								currentMousePosition.z),
+								currentMousePosition.z);
+						
+						currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
+							move2Vector,
 							Time.deltaTime * 5f);
 					}
 					
@@ -102,6 +120,13 @@ public class GridMovement : MonoBehaviour {
 					for(int i = 0; i < 6; i++)
 					{
 						currentMovingCell = Grid[i,(int)index.x];
+						if(currentMovingCell == null)
+						{
+							
+							Debug.Log ("NULL BREAK 3: " + Grid.Length	);
+							Debug.Log ("Position 3: ind.y - " + (int)index.y + " - i - " + i);
+							Debug.DebugBreak();
+						}
 						currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
 							new Vector3(currentMousePosition.x, 
 								currentMousePosition.y, 
@@ -113,25 +138,42 @@ public class GridMovement : MonoBehaviour {
 		}
 		catch(System.Exception e)
 		{
-			Debug.Log("ERROR");
 			Debug.Break();
+			Debug.Log("ERROR: " + e.StackTrace);
+			//printGrid();
 		}
+	}
+	
+	void printGrid()
+	{
+		foreach(Transform tgrid in Grid)
+		{
+		 	Debug.Log(tgrid.position);
+		}
+		
 	}
 	
 	void setGrid()
 	{
 		//Debug.Log("Set Grid");
+		Grid = new Transform[6,10];
 		float x,z;
+		int count = 0;
 		//orderedRow = new List<Transform>();
 		foreach(Transform tra in gridContainer.transform)
 		{
 			//set the values as a zero base position
 			x = tra.position.x + 4.5f; //half the size of the grid - half the size of the block
 			z = tra.position.z + 2.5f;
-			
+			//Debug.Log(x + ", " + z);
 			//adding it to our internal manager
-			Grid[(int)z,(int)x] = tra;
+			if(Grid[Mathf.RoundToInt(z),Mathf.RoundToInt(x)] == null)
+				Grid[Mathf.RoundToInt(z),Mathf.RoundToInt(x)] = tra;
+			else
+				Debug.Log("overwriting cell on load");
+			count++;
 		}
+		Debug.Log(count);
 	}
 	IEnumerator axisManager()
 	{
@@ -139,7 +181,7 @@ public class GridMovement : MonoBehaviour {
 		float timeDiff;
 		Vector3 posDiff;
 		
-		yield return new WaitForSeconds(0.15f);
+		yield return new WaitForSeconds(0.1f);
 		
 		mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		finalTime = Time.time;
