@@ -1,8 +1,11 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class GridMovement: MonoBehaviour {
+	
+	public LayerMask lm;
 	
 	#region Grid Elements
 	public Transform gridContainer;
@@ -25,6 +28,7 @@ public class GridMovement: MonoBehaviour {
 	
 	#region Grid Movement
 	private Vector2 index;
+	private Transform currentMovingCell;
 	private RaycastHit[] movingCells;
 	private float direction; //positive one dir - negative the other
 	private int axis;
@@ -33,7 +37,7 @@ public class GridMovement: MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		setGrid();
+		//setGrid();
 	}
 	
 	// Update is called once per frame
@@ -41,7 +45,7 @@ public class GridMovement: MonoBehaviour {
 	{
 		if(!selectedCell)
 		{
-			Debug.Log("No Cell Selected");
+			//Debug.Log("No Cell Selected");
 			if(Input.GetMouseButtonDown(0))
 			{
 				selectionTime = Time.time;
@@ -63,7 +67,8 @@ public class GridMovement: MonoBehaviour {
 			{
 				if(!snappingToGrid)
 					UpdatePosition();
-				else;
+				else
+					SnapToGrid();
 			}
 			if(Input.GetMouseButtonUp(0))
 			{
@@ -72,15 +77,101 @@ public class GridMovement: MonoBehaviour {
 			}
 		}
 	}
-	
-	void UpdatePosition()
+	void SnapToGrid()
 	{
+		Vector3 tester = movingCells[0].transform.position;
+		Vector3 move2Position;
+		
+		tester.x = (int)(tester.x*1000)%1000;
+		tester.z = (int)(tester.z*1000)%1000;
+		
+		if(Mathf.Abs(tester.x) == 500 && Mathf.Abs(tester.z) == 500)
+		{
+			//Debug.Log("snapping Done");
+			snappingToGrid = false;
+			selectedCell = false;
+			axis = 0;
+			return;
+		}
+		
 		switch(axis)
 		{
 		case -1:
-			
+			for(int i = 0; i < 6; i++)
+			{
+				currentMovingCell = movingCells[i].transform;
+				move2Position = currentMovingCell.position;
+				
+				move2Position.z = Mathf.Floor(move2Position.z)+0.5f;
+				move2Position.z = Mathf.Round(move2Position.z*2)/2;
+				
+				currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
+					move2Position,
+					Time.deltaTime *5.0f);
+			}
 			break;
 		case 1:
+			
+			for(int i = 0; i < 11; i++)
+			{
+				currentMovingCell = movingCells[i].transform;
+				move2Position = currentMovingCell.position;
+				
+				move2Position.x = Mathf.Floor(move2Position.x)+0.5f;
+				move2Position.x = Mathf.Round(move2Position.x*2)/2;
+				
+				currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
+					move2Position,
+					Time.deltaTime *5.0f);
+			}
+			
+			break;
+		default:
+			break;
+		}
+		
+		
+	}
+	void UpdatePosition()
+	{
+		Vector3 currentMousePosition;
+		Vector3 move2Vector;
+		
+		currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		currentMousePosition.y = 2f;
+		
+		switch(axis)
+		{
+		case -1:
+			currentMousePosition.x = Mathf.Floor(selectedCellPosition.x) + 0.5f;
+			for(int i = 0; i < 6; i++)
+			{
+				currentMovingCell = movingCells[i].transform;
+				
+				move2Vector = new Vector3(currentMousePosition.x, 
+						currentMousePosition.y, 
+						currentMousePosition.z - (i));
+				
+				currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
+					move2Vector,
+					Time.deltaTime * 5f);
+			}
+			break;
+		case 1:
+			currentMousePosition.z = Mathf.Floor(selectedCellPosition.z) + 0.5f;
+
+			for(int i = 0; i< 11; i++)
+			{
+				currentMovingCell = movingCells[i].transform;
+				move2Vector = new Vector3(currentMousePosition.x + (i-index.x), 
+								currentMousePosition.y, 
+								currentMousePosition.z);
+				
+				currentMovingCell.position = Vector3.MoveTowards(currentMovingCell.position,
+							move2Vector,
+							Time.deltaTime * 5f);
+				
+			}
 			break;
 		default:
 			break;
@@ -90,7 +181,7 @@ public class GridMovement: MonoBehaviour {
 	IEnumerator axisManager()
 	{
 		selectedCell = true;
-		movingCells = null;
+		//movingCells = null;
 		axis = 0;
 		
 		float timeDiff;
@@ -115,7 +206,20 @@ public class GridMovement: MonoBehaviour {
 			
 			origin = emiters.FindChild(axis.ToString()).FindChild(index.y.ToString()).transform.position;
 			destination = Vector3.right;
-			movingCells = Physics.RaycastAll(origin,destination,11f);
+			
+			movingCells = Physics.RaycastAll(origin, destination, 15f,lm.value);
+			List<raycastSorter> rh = new List<raycastSorter>();
+			foreach(RaycastHit h in movingCells)
+			{
+				rh.Add(new raycastSorter(h));
+			}
+			
+			rh.Sort();
+			
+			for(int i = 0; i < movingCells.Length; i++)
+			{
+				movingCells[i] = rh[i].hit;
+			}
 		} 
 		else
 		{
@@ -126,10 +230,67 @@ public class GridMovement: MonoBehaviour {
 			
 			origin = emiters.FindChild(axis.ToString()).FindChild(index.x.ToString()).transform.position;
 			destination = Vector3.back;
-			movingCells = Physics.RaycastAll(origin,destination,6f);
+			movingCells = Physics.RaycastAll(origin,destination,10f,lm.value);
+			List<raycastSorter> rh = new List<raycastSorter>();
+			foreach(RaycastHit h in movingCells)
+			{
+				rh.Add(new raycastSorter(h));
+			}
+			
+			rh.Sort();
+			
+			for(int i = 0; i < movingCells.Length; i++)
+			{
+				movingCells[i] = rh[i].hit;
+			}
 		}	
 	}
-	
+	public void updateMovingCells()
+	{
+		Vector3 origin, destination;
+		List<raycastSorter> rh = new List<raycastSorter>();
+		switch(axis)
+		{
+		case 1:
+			rh.Clear();
+			origin = emiters.FindChild(axis.ToString()).FindChild(index.y.ToString()).transform.position;
+			destination = Vector3.right;
+			
+			movingCells = Physics.RaycastAll(origin, destination, 15f,lm.value);
+			foreach(RaycastHit h in movingCells)
+			{
+				rh.Add(new raycastSorter(h));
+			}
+			
+			rh.Sort();
+			
+			for(int i = 0; i < movingCells.Length; i++)
+			{
+				movingCells[i] = rh[i].hit;
+			}
+			break;
+		case -1:
+			rh.Clear();
+			origin = emiters.FindChild(axis.ToString()).FindChild(index.x.ToString()).transform.position;
+			destination = Vector3.back;
+			
+			movingCells = Physics.RaycastAll(origin,destination,10f,lm.value);
+			foreach(RaycastHit h in movingCells)
+			{
+				rh.Add(new raycastSorter(h));
+			}
+			
+			rh.Sort();
+			
+			for(int i = 0; i < movingCells.Length; i++)
+			{
+				movingCells[i] = rh[i].hit;
+			}
+			break;
+		default:
+			break;
+		}
+	}
 	void printGrid()
 	{
 		foreach(Transform tgrid in Grid)
