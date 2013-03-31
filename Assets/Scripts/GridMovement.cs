@@ -112,7 +112,7 @@ public class GridMovement: MonoBehaviour {
 			break;
 		case 1:
 			
-			for(int i = 0; i < 11; i++)
+			for(int i = 0; i < 10; i++)
 			{
 				currentMovingCell = movingCells[i].transform;
 				move2Position = currentMovingCell.position;
@@ -160,7 +160,7 @@ public class GridMovement: MonoBehaviour {
 		case 1:
 			currentMousePosition.z = Mathf.Floor(selectedCellPosition.z) + 0.5f;
 
-			for(int i = 0; i< 11; i++)
+			for(int i = 0; i< 10; i++)
 			{
 				currentMovingCell = movingCells[i].transform;
 				move2Vector = new Vector3(currentMousePosition.x + (i-index.x), 
@@ -207,7 +207,7 @@ public class GridMovement: MonoBehaviour {
 			origin = emiters.FindChild(axis.ToString()).FindChild(index.y.ToString()).transform.position;
 			destination = Vector3.right;
 			
-			movingCells = Physics.RaycastAll(origin, destination, 15f,lm.value);
+			movingCells = Physics.RaycastAll(origin, destination, 30f);
 			List<raycastSorter> rh = new List<raycastSorter>();
 			foreach(RaycastHit h in movingCells)
 			{
