@@ -22,7 +22,7 @@ public class TriggerCell : MonoBehaviour {
 		if(currentObject != null)
 		{
 			currentObject.transform.position = copyPos;
-			movement.updateMovingCells();
+			//movement.updateMovingCells();
 		}
 		currentObject = coll;
 		child.renderer.material = currentObject.renderer.material;

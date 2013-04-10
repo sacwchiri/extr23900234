@@ -44,8 +44,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Cell.cs" />
+     <Compile Include="Assets\Scripts\GridCellFiller.cs" />
      <Compile Include="Assets\Scripts\GridMovement.cs" />
-     <Compile Include="Assets\Scripts\Grill2.cs" />
+     <Compile Include="Assets\Scripts\PathfindNode.cs" />
+     <Compile Include="Assets\Scripts\Pathfinder.cs" />
+     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
+     <Compile Include="Assets\Scripts\TriggerCell.cs" />
+     <Compile Include="Assets\Scripts\raycastSorter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
