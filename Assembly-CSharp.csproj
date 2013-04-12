@@ -47,10 +47,8 @@
      <Compile Include="Assets\Scripts\Cell.cs" />
      <Compile Include="Assets\Scripts\GridCellFiller.cs" />
      <Compile Include="Assets\Scripts\GridMovement.cs" />
-     <Compile Include="Assets\Scripts\PathfindNode.cs" />
-     <Compile Include="Assets\Scripts\Pathfinder.cs" />
      <Compile Include="Assets\Scripts\PlayerMovement.cs" />
-     <Compile Include="Assets\Scripts\TriggerCell.cs" />
+     <Compile Include="Assets\Scripts\aStar.cs" />
      <Compile Include="Assets\Scripts\raycastSorter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

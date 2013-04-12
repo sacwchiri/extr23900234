@@ -2,32 +2,37 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerMovement : MonoBehaviour {
-	
-	public bool check = false;
-	
-	List<RaycastHit> surroundings = new List<RaycastHit>();
-	
-	RaycastHit temp;
-	Vector3 origin;
-	Vector3 direction;
-	
+public class PlayerMovement : MonoBehaviour
+{
 	public Cell.CellType playerType;
+	private Transform checkablePos;
+	private Vector3 pos;
 	
-	// Use this for initialization
-	void Start () 
+	public IEnumerator movePlayer(List<Transform> path)
 	{
-	
-	}
-	// Update is called once per frame
-	void Update () 
-	{
-		if(check)
+		Vector3 tempPos = Vector3.zero;
+		pos = path[path.Count-1].position;
+//		pos;
+		
+		for(int i = path.Count-2; i >= 0; i--)
 		{
-			origin = transform.position;
-			direction = Vector3.forward;
-			Physics.Raycast(origin,direction,out temp);
-			surroundings.Add(temp);
+			tempPos = new Vector3(path[i].position.x,
+				transform.position.y,
+				path[i].position.z);
+			while(pos != path[i].position)
+			{
+				transform.position = Vector3.MoveTowards(
+										transform.position,
+										tempPos,
+										1 * Time.deltaTime);
+				
+				pos = transform.position;
+				pos.y = path[i].position.y;
+//				checkablePos.position = pos;
+				yield return new WaitForSeconds(0);
+			}
+			yield return new WaitForSeconds(0);
 		}
-	}
+		yield return new WaitForSeconds(0);
+	}	
 }

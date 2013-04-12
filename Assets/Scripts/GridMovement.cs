@@ -6,6 +6,8 @@ using System.Collections.Generic;
 public class GridMovement: MonoBehaviour {
 	
 	public GridCellFiller gridFill;
+	private aStar astarHolder;
+	private float runTime;
 	
 	#region Grid Elements
 	public Transform gridContainer;
@@ -15,6 +17,8 @@ public class GridMovement: MonoBehaviour {
 	
 	#region cell selection
 	private bool selectedCell = false;
+	public bool findingPath = false;
+	public bool movingPlayer = false;
 	private Vector3 selectedCellPosition;
 	private float selectionTime;
 	private float finalTime;
@@ -33,16 +37,20 @@ public class GridMovement: MonoBehaviour {
 	private int axis;
 	#endregion
 	
+	#region player Movement
+	private PlayerMovement unitMovement;
+	#endregion
 	
 	// Use this for initialization
 	void Start () {
 		//setGrid();
+		
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if(!selectedCell)
+		if(!selectedCell && !findingPath && !movingPlayer)
 		{
 			//Debug.Log("No Cell Selected");
 			if(Input.GetMouseButtonDown(0))
@@ -54,9 +62,21 @@ public class GridMovement: MonoBehaviour {
 				{
 					if(hitter.transform.tag == "Player")
 					{
-						selectedCell = true;
-						Debug.Log("beginning a*");
-						gridFill.fillCells();
+						Ray r2 = new Ray(hitter.transform.position,Vector3.down);
+						RaycastHit d2;
+						if(Physics.Raycast(r2,out d2))
+						{
+							PlayerMovement pm = hitter.transform.GetComponent<PlayerMovement>();
+							Cell cellHolder = d2.transform.GetComponent<Cell>();
+							
+							if(pm.playerType == cellHolder.myType)
+							{
+								astarHolder = new aStar();
+								astarHolder.startNode = cellHolder;
+								unitMovement = hitter.transform.GetComponent<PlayerMovement>();
+								findingPath = true;
+							}
+						}
 					}
 					else if(hitter.transform.tag == "Cell")
 					{
@@ -75,7 +95,7 @@ public class GridMovement: MonoBehaviour {
 				}
 			}
 		}
-		else
+		else if(selectedCell)
 		{
 			if(axis != 0)
 			{
@@ -90,6 +110,49 @@ public class GridMovement: MonoBehaviour {
 				snappingToGrid = true;
 			}
 		}
+		else if(findingPath)
+		{
+			if(Input.GetMouseButtonDown(0))
+			{
+				Ray identifier = Camera.main.ScreenPointToRay(Input.mousePosition);
+				RaycastHit hitter = new RaycastHit();
+				
+				if(Physics.Raycast(identifier,out hitter))
+				{	
+//					Debug.Log("beginning a*");
+					astarHolder.targetNode = hitter.transform.GetComponent<Cell>();
+					gridFill.fillCells(hitter.transform);
+					movingPlayer = true;
+					findingPath = false;
+					StartCoroutine(playerManager());
+				}
+//				else
+//				{
+//					Debug.DrawRay(identifier.origin,identifier.direction*30f,Color.red,20f);
+//					Debug.Log("mouse: " + Input.mousePosition);
+//					Debug.Log("ray o:" + identifier.origin);
+//					Debug.Log("ray d:" + identifier.direction);
+//				}
+			}
+		}
+	}
+	private IEnumerator playerManager()
+	{
+		runTime = Time.time;
+		yield return StartCoroutine(astarHolder.pathfinding());
+		runTime = Time.time - runTime;
+		Debug.Log(runTime);
+		if(astarHolder.foundTarget)
+		{
+			yield return StartCoroutine(astarHolder.traceback());
+			yield return StartCoroutine(unitMovement.movePlayer(astarHolder.path));
+		}
+		else if(astarHolder.stop)
+		{
+//			Debug.Log("astar Stopped from inside");
+		}
+		movingPlayer = false;
+		
 	}
 	void ClearOverBuffer()
 	{

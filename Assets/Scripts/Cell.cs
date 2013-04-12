@@ -8,13 +8,15 @@ public class Cell : MonoBehaviour
 	public CellType myType;
 	
 	#region a* variables
-	public ushort h_heuristicValue = 0;
-	public ushort g_moveValue = 0;
-	public ushort f_totalCost = 0;
+	public int h_heuristicValue = 0;
+	public int g_moveValue = 0;
+	public int f_totalCost = 0;
 	
-	public Cell parent;
-	public Cell top,bottom,left,right;
-	
+	public Cell Parent = null;
+	public Cell top = null;
+	public Cell bottom = null;
+	public Cell left = null;
+	public Cell right =null;
 	#endregion
 	
 	#region initial cell identification
@@ -34,5 +36,8 @@ public class Cell : MonoBehaviour
 	}
 	#endregion
 	
-	
+	public void CalculateFValue()
+	{
+		f_totalCost = g_moveValue + h_heuristicValue;
+	}
 }

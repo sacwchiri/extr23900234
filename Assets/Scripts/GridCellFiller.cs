@@ -6,12 +6,15 @@ using System.Collections.Generic;
 public class GridCellFiller : MonoBehaviour {
 
 	public Transform emiters;
+	public Transform TargetCell;
 	
-	public void fillCells()
+	public void fillCells(Transform target)
 	{
 		Transform[] 	xEmiters; //holds the emiters for x Axis
 		Transform[] 	yEmiters; //holds the emiters for y Axis
 		Transform 		childrenHolder; //Temp holder of the parent transform
+		
+		TargetCell = target;
 		
 		//getting the transform for the emitters (gameObject Transforms)
 		childrenHolder = emiters.FindChild("1");
@@ -30,6 +33,7 @@ public class GridCellFiller : MonoBehaviour {
 		{
 			orderAndSetCells(Physics.RaycastAll(yem.position,Vector3.right),false);
 		}
+		
 	}//end fillCells
 	
 	
@@ -44,6 +48,7 @@ public class GridCellFiller : MonoBehaviour {
 	/// </param>
 	private void orderAndSetCells(RaycastHit[] hitters, bool direction)
 	{
+		
 		Cell kvpCell;
 		//Its a sorted list that orders the hits based on the distance
 		//this list is overWritten constantly
@@ -52,7 +57,7 @@ public class GridCellFiller : MonoBehaviour {
 		//Add all RaycastHit to a sorted list based on the hit distance
 		foreach(RaycastHit hit in hitters)
 		{
-			hitList.Add(hit.distance,hit.transform.GetComponent<Cell>());
+			hitList.Add(hit.distance,hit.transform.GetComponent<Cell>());	
 		}
 		
 		//Go throught all the keys (in order) grabbing the cells and
@@ -88,7 +93,13 @@ public class GridCellFiller : MonoBehaviour {
 					kvpCell.bottom = null;
 				else
 					kvpCell.left = null;
-			}	
+			}
+			if(kvpCell!=null)
+			{
+				//calculate heuristics
+				Vector3 tempH = kvpCell.transform.position - TargetCell.position;
+				kvpCell.h_heuristicValue = (int)(Mathf.Abs(tempH.x)+Mathf.Abs(tempH.z));
+			}
 		}//end ForEach
 	}//end orderSetCells
 }
