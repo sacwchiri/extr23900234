@@ -44,12 +44,13 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Cell.cs" />
-     <Compile Include="Assets\Scripts\GridCellFiller.cs" />
-     <Compile Include="Assets\Scripts\GridMovement.cs" />
-     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
-     <Compile Include="Assets\Scripts\aStar.cs" />
-     <Compile Include="Assets\Scripts\raycastSorter.cs" />
+     <Compile Include="Assets\Scripts\Grid\Cell.cs" />
+     <Compile Include="Assets\Scripts\Grid\GridMovement.cs" />
+     <Compile Include="Assets\Scripts\Grid\raycastSorter.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\GridCellFiller.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\aStar.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
+     <Compile Include="Assets\Scripts\Player\characterManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
