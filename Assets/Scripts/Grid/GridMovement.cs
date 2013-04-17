@@ -3,49 +3,52 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridMovement: MonoBehaviour {
+public class GridMovement: MonoBehaviour 
+{	
+	public characterManager 	playerChecks;
+	public GridCellFiller 		gridFill;
+	public exitController		playerExit;
+	private aStar 				astarHolder;
+	private float 				runTime;
 	
-	public GridCellFiller gridFill;
-	private aStar astarHolder;
-	private float runTime;
+	#region sound
+	public AudioSource foundPath;
+	public AudioSource notFoundPath;
+	
+	#endregion
 	
 	#region Grid Elements
-	public Transform gridContainer;
-	public Transform emiters;
-	private List<Transform> OrderedGrid;
+	public Transform 			gridContainer;
+	public Transform 			emiters;
+	private List<Transform> 	OrderedGrid;
 	#endregion
 	
 	#region cell selection
-	private bool selectedCell = false;
-	public bool findingPath = false;
-	public bool movingPlayer = false;
-	private Vector3 selectedCellPosition;
-	private float selectionTime;
-	private float finalTime;
-	private Vector3 mouseDirection;
+	private bool 				selectedCell = false;
+	private Vector3 			selectedCellPosition;
+	private float 				selectionTime;
+	private float 				finalTime;
+	private Vector3 			mouseDirection;
+	public bool 				findingPath = false;
+	public bool 				movingPlayer = false;
+	public bool 				goingFinish = false;
 	#endregion
 	
 	#region Snap to Grid
-	bool snappingToGrid = false;
+	bool 						snappingToGrid = false;
 	#endregion
 	
 	#region Grid Movement
-	private Vector2 index;
-	private Transform currentMovingCell;
-	private RaycastHit[] movingCells;
-	private float direction; //positive one dir - negative the other
-	private int axis;
+	private Vector2 			index;
+	private Transform 			currentMovingCell;
+	private RaycastHit[] 		movingCells;
+	private float 				direction; //positive one dir - negative the other
+	private int 				axis;
 	#endregion
 	
 	#region player Movement
 	private PlayerMovement unitMovement;
 	#endregion
-	
-	// Use this for initialization
-	void Start () {
-		//setGrid();
-		
-	}
 	
 	// Update is called once per frame
 	void Update () 
@@ -62,23 +65,27 @@ public class GridMovement: MonoBehaviour {
 				{
 					if(hitter.transform.tag == "Player")
 					{
-						Ray r2 = new Ray(hitter.transform.position,Vector3.down);
-						RaycastHit d2;
-						if(Physics.Raycast(r2,out d2))
+						Player playEr;
+						playEr = hitter.transform.GetComponent<Player>();
+						
+//						Debug.Log(playEr.transform.GetComponent<PlayerMovement
+						
+						if(!playEr.wrongCell)
 						{
-							PlayerMovement pm = hitter.transform.GetComponent<PlayerMovement>();
-							Cell cellHolder = d2.transform.GetComponent<Cell>();
-							
-							if(pm.playerType == cellHolder.myType)
+							Ray r2 = new Ray(hitter.transform.position,Vector3.down);
+							RaycastHit d2;
+							if(Physics.Raycast(r2,out d2))
 							{
+								Cell cellHolder = d2.transform.GetComponent<Cell>();
 								astarHolder = new aStar();
 								astarHolder.startNode = cellHolder;
 								unitMovement = hitter.transform.GetComponent<PlayerMovement>();
+								Debug.Log(unitMovement.playerType);
 								findingPath = true;
 							}
 						}
 					}
-					else if(hitter.transform.tag == "Cell")
+					else if(hitter.transform.tag == "Cell" || hitter.transform.tag == "Finish")
 					{
 						selectionTime = Time.time;
 						
@@ -108,6 +115,7 @@ public class GridMovement: MonoBehaviour {
 			{
 				//selectedCell = false;
 				snappingToGrid = true;
+				playerChecks.checkForDamage();
 			}
 		}
 		else if(findingPath)
@@ -120,11 +128,28 @@ public class GridMovement: MonoBehaviour {
 				if(Physics.Raycast(identifier,out hitter))
 				{	
 //					Debug.Log("beginning a*");
-					astarHolder.targetNode = hitter.transform.GetComponent<Cell>();
-					gridFill.fillCells(hitter.transform);
-					movingPlayer = true;
-					findingPath = false;
-					StartCoroutine(playerManager());
+					if(hitter.transform.tag == "Cell")
+					{
+						astarHolder.targetNode = hitter.transform.GetComponent<Cell>();
+						gridFill.fillCells(hitter.transform);
+						movingPlayer = true;
+						findingPath = false;
+						StartCoroutine(playerManager());
+					}
+					else if(hitter.transform.tag == "Finish")
+					{
+						Ray r2 = new Ray(hitter.transform.position,Vector3.down);
+						RaycastHit d2;
+						if(Physics.Raycast(r2,out d2))
+						{
+							astarHolder.targetNode = d2.transform.GetComponent<Cell>();
+							gridFill.fillCells(d2.transform);
+							movingPlayer = true;
+							goingFinish = true;
+							findingPath = false;
+							StartCoroutine(playerManager());
+						}
+					}
 				}
 //				else
 //				{
@@ -138,17 +163,29 @@ public class GridMovement: MonoBehaviour {
 	}
 	private IEnumerator playerManager()
 	{
+		Player currentPlayer;
 		runTime = Time.time;
 		yield return StartCoroutine(astarHolder.pathfinding());
 		runTime = Time.time - runTime;
 		Debug.Log(runTime);
+		
 		if(astarHolder.foundTarget)
 		{
+			foundPath.Play();
 			yield return StartCoroutine(astarHolder.traceback());
+			currentPlayer = unitMovement.transform.GetComponent<Player>();
+			currentPlayer.walking = true;
 			yield return StartCoroutine(unitMovement.movePlayer(astarHolder.path));
+			if(goingFinish)
+			{
+				yield return StartCoroutine(playerExit.exitSecuence(currentPlayer,unitMovement));
+				goingFinish = false;
+			}
+			currentPlayer.walking = false;
 		}
 		else if(astarHolder.stop)
 		{
+			notFoundPath.Play();
 //			Debug.Log("astar Stopped from inside");
 		}
 		movingPlayer = false;
@@ -325,7 +362,7 @@ public class GridMovement: MonoBehaviour {
 				insertPos.x += 1f;
 				Instantiate(rh[i].collider.transform.gameObject,
 					insertPos,
-					Quaternion.identity);
+					rh[i].collider.transform.rotation);
 			}
 			insertPos = rh[0].collider.transform.position;
 			for(int i = rh.Count-1; i >= index.x; i--)
@@ -333,7 +370,7 @@ public class GridMovement: MonoBehaviour {
 				insertPos.x -= 1f;
 				Instantiate(rh[i].collider.transform.gameObject,
 					insertPos,
-					Quaternion.identity);
+					rh[i].collider.transform.rotation);
 			}
 			//after here we need to recast the raycast for the purpouse of getting the new rows
 			rh.Clear();
@@ -374,7 +411,7 @@ public class GridMovement: MonoBehaviour {
 				insertPos.z += 1f;
 				Instantiate(rh[i].collider.transform.gameObject,
 					insertPos,
-					Quaternion.identity);
+					rh[i].collider.transform.rotation);
 			}
 			
 			insertPos = rh[0].collider.transform.position;
@@ -383,7 +420,7 @@ public class GridMovement: MonoBehaviour {
 				insertPos.z -= 1f;
 				Instantiate(rh[i].collider.transform.gameObject,
 					insertPos,
-					Quaternion.identity);
+					rh[i].collider.transform.rotation);
 			}
 			//after here we need to recast the raycast for the purpouse of getting the new rows
 			rh.Clear();

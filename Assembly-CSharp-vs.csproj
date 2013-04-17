@@ -47,10 +47,16 @@
      <Compile Include="Assets\Scripts\Grid\Cell.cs" />
      <Compile Include="Assets\Scripts\Grid\GridMovement.cs" />
      <Compile Include="Assets\Scripts\Grid\raycastSorter.cs" />
+     <Compile Include="Assets\Scripts\InitialLoad\definePlayerPrefs.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\GridCellFiller.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\aStar.cs" />
+     <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
      <Compile Include="Assets\Scripts\Player\characterManager.cs" />
+     <Compile Include="Assets\Scripts\Player\exitController.cs" />
+ <Reference Include="Assembly-UnityScript-firstpass">
+ <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -73,7 +73,7 @@ public class GridCellFiller : MonoBehaviour {
 					kvpCell.right = hitList[k+1];
 			}
 			//we catch the exception for those keys that are over the edges
-			catch(KeyNotFoundException e)
+			catch(KeyNotFoundException)
 			{
 				if(direction)
 					kvpCell.top = null;
@@ -87,7 +87,7 @@ public class GridCellFiller : MonoBehaviour {
 				else
 					kvpCell.left = hitList[k-1];
 			}
-			catch(KeyNotFoundException e)
+			catch(KeyNotFoundException)
 			{
 				if(direction)
 					kvpCell.bottom = null;

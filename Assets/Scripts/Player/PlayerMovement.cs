@@ -24,15 +24,25 @@ public class PlayerMovement : MonoBehaviour
 				transform.position = Vector3.MoveTowards(
 										transform.position,
 										tempPos,
-										1 * Time.deltaTime);
+										3 * Time.deltaTime);
 				
 				pos = transform.position;
 				pos.y = path[i].position.y;
 //				checkablePos.position = pos;
-				yield return new WaitForSeconds(0);
+				yield return null;
 			}
-			yield return new WaitForSeconds(0);
+			yield return null;
 		}
-		yield return new WaitForSeconds(0);
-	}	
+	}
+	public IEnumerator movePlayer(Transform destiny)
+	{
+		while(transform.position != destiny.position)
+		{
+			transform.position = Vector3.MoveTowards(
+								transform.position,
+								destiny.position,
+								3 * Time.deltaTime);
+			yield return null;
+		}
+	}
 }

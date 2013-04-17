@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 
 Project("{DDB2FCD8-F6E9-674A-D4DF-7708ADD3B2FC}") = "Extremophiles", "Assembly-CSharp.csproj", "{BF1D9EE0-1281-A631-671F-E38DB8793B3B}"
 EndProject
+Project("{DDB2FCD8-F6E9-674A-D4DF-7708ADD3B2FC}") = "Extremophiles", "Assembly-UnityScript-firstpass.unityproj", "{ACC113FE-8802-4BD5-F7CE-B4F8C22F0448}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,11 +15,15 @@ Global
 		{BF1D9EE0-1281-A631-671F-E38DB8793B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF1D9EE0-1281-A631-671F-E38DB8793B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF1D9EE0-1281-A631-671F-E38DB8793B3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACC113FE-8802-4BD5-F7CE-B4F8C22F0448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC113FE-8802-4BD5-F7CE-B4F8C22F0448}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACC113FE-8802-4BD5-F7CE-B4F8C22F0448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACC113FE-8802-4BD5-F7CE-B4F8C22F0448}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-																																																																												GlobalSection(MonoDevelopProperties) = preSolution
+													GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
