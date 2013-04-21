@@ -7,7 +7,7 @@ public class LevelLoader : MonoBehaviour {
 	public Transform[] holes;
 	public Transform LevelEntrance;
 	
-	void Update()
+	void Start()
 	{
 		if(PlayerPrefs.GetInt("currentLevel") < 6)
 		{
@@ -16,7 +16,8 @@ public class LevelLoader : MonoBehaviour {
 		}
 		else
 		{
-			LevelEntrance.gameObject.SetActive(false);
+			StartCoroutine(TriggerFinalMovie());
+			LevelEntrance.position = Vector3.zero;;
 		}
 	}
 	
@@ -25,5 +26,11 @@ public class LevelLoader : MonoBehaviour {
 		if(c.tag == "Player")
 			Application.LoadLevel("loadLevel");//go to level loader
 		
+	}
+
+	private IEnumerator TriggerFinalMovie ()
+	{
+		yield return new WaitForSeconds(4);
+		Application.LoadLevel("finalAnimationLoader");
 	}
 }

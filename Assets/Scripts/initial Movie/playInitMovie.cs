@@ -49,6 +49,6 @@ public class playInitMovie : MonoBehaviour {
 		{
 			r.SetActive(false);
 		}
-		Application.LoadLevel("SelectLevelLoader");
+		Application.LoadLevel("loadLevel");
 	}
 }

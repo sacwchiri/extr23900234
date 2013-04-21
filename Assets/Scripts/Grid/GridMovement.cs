@@ -80,7 +80,7 @@ public class GridMovement: MonoBehaviour
 								astarHolder = new aStar();
 								astarHolder.startNode = cellHolder;
 								unitMovement = hitter.transform.GetComponent<PlayerMovement>();
-								Debug.Log(unitMovement.playerType);
+//								Debug.Log(unitMovement.playerType);
 								findingPath = true;
 							}
 						}

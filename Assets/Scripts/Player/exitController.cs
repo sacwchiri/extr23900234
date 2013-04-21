@@ -14,13 +14,13 @@ public class exitController : MonoBehaviour {
 	void Start()
 	{
 		ActiveCharacters = (byte)CharactersContainer.childCount;
-		Debug.Log(ActiveCharacters);
+//		Debug.Log(ActiveCharacters);
 	}
 	void Update()
 	{
 		if(FinishedCharacters >= ActiveCharacters)
 		{
-			Debug.Log("Game is done");
+//			Debug.Log("Game is done");
 			if(PlayerPrefs.HasKey("currentLevel"))
 			{
 				if(playOnce)
@@ -39,7 +39,7 @@ public class exitController : MonoBehaviour {
 	public IEnumerator LoadNext()
 	{
 		yield return new WaitForSeconds(1.5f);
-		Application.LoadLevel("LevelSelect");
+		Application.LoadLevel("SelectLevelLoader");
 	}
 	void OnTriggerEnter(Collider c)
 	{

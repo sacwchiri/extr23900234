@@ -1,13 +1,6 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\initial Movie\playInitMovie.cs">
-    <Files>
-      <File FileName="Assets\Scripts\initial Movie\playInitMovie.cs" Line="52" Column="43" />
-      <File FileName="Assets\Scripts\LevelSelect\LevelSelectLoader.cs" Line="11" Column="34" />
-      <File FileName="Assets\Scripts\Start\GUIButtonsStart.cs" Line="76" Column="42" />
-      <File FileName="Assets\Scripts\InitialLoad\definePlayerPrefs.cs" Line="11" Column="39" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
