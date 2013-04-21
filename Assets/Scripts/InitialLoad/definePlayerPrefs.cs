@@ -4,12 +4,13 @@ using System.Collections;
 public class definePlayerPrefs : MonoBehaviour {
 
 	// Use this for initialization
-	void Start () {
-	
+	void Start () 
+	{
+		PlayerPrefs.DeleteAll();
+		PlayerPrefs.Save();
+		PlayerPrefs.SetInt("currentLevel", 0);
+		
+		Application.LoadLevel("StartScreen");
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

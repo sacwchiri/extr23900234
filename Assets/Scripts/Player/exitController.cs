@@ -9,6 +9,7 @@ public class exitController : MonoBehaviour {
 	
 	private byte ActiveCharacters = 0;
 	private byte FinishedCharacters = 0;
+	private bool playOnce = true;
 	
 	void Start()
 	{
@@ -20,7 +21,25 @@ public class exitController : MonoBehaviour {
 		if(FinishedCharacters >= ActiveCharacters)
 		{
 			Debug.Log("Game is done");
+			if(PlayerPrefs.HasKey("currentLevel"))
+			{
+				if(playOnce)
+				{
+					playOnce = false;
+					PlayerPrefs.SetInt("currentLevel", PlayerPrefs.GetInt("currentLevel") + 1);
+					StartCoroutine(LoadNext());
+				}
+			}
+			else
+			{
+				Debug.Log("No Key for current Level was found");
+			}
 		}
+	}
+	public IEnumerator LoadNext()
+	{
+		yield return new WaitForSeconds(1.5f);
+		Application.LoadLevel("LevelSelect");
 	}
 	void OnTriggerEnter(Collider c)
 	{

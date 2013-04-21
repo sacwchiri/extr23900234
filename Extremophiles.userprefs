@@ -1,12 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player\exitController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\initial Movie\playInitMovie.cs">
     <Files>
-      <File FileName="Assets\Scripts\Player\exitController.cs" Line="34" Column="24" />
-      <File FileName="Assets\Scripts\Player\Player.cs" Line="126" Column="8" />
-      <File FileName="Assets\Scripts\Grid\GridMovement.cs" Line="188" Column="24" />
-      <File FileName="Assets\Standard Assets\SimpleSpritePro1.js" Line="80" Column="16" />
-      <File FileName="Assets\Scripts\Player\PlayerMovement.cs" Line="37" Column="31" />
+      <File FileName="Assets\Scripts\initial Movie\playInitMovie.cs" Line="52" Column="43" />
+      <File FileName="Assets\Scripts\LevelSelect\LevelSelectLoader.cs" Line="11" Column="34" />
+      <File FileName="Assets\Scripts\Start\GUIButtonsStart.cs" Line="76" Column="42" />
+      <File FileName="Assets\Scripts\InitialLoad\definePlayerPrefs.cs" Line="11" Column="39" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
