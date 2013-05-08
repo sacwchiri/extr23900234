@@ -8,11 +8,16 @@ public class LevelSelectLoader : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		Application.LoadLevel(levelName);
+		StartCoroutine(runIt());
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
+	}
+	private IEnumerator runIt()
+	{
+		yield return new WaitForSeconds(2);
+		Application.LoadLevel(levelName);
 	}
 }
